@@ -34,7 +34,7 @@ fn main() {
         std::io::stdout().flush().expect("chatbot: IOERR");
         buf.clear();
         stdin.read_line(&mut buf).expect("chatbot: IOERR");
-        let prompt = buf.trim_start();
+        let prompt = buf.trim_start().trim_end();
         if prompt.contains("quit") {
             break;
         } else if prompt.contains("get models") || prompt.contains("list models") {
