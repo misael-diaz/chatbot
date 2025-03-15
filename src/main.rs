@@ -1,7 +1,7 @@
 use std::io::Write;
 
 #[derive(serde_derive::Deserialize)]
-struct ModelDetails {
+struct ApiTagsModelDetails {
     parent_model: String,
     format: String,
     family: String,
@@ -11,18 +11,18 @@ struct ModelDetails {
 }
 
 #[derive(serde_derive::Deserialize)]
-struct Model {
+struct ApiTagsModel {
     name: String,
     model: String,
     modified_at: String,
     size: u64,
     digest: String,
-    details: ModelDetails,
+    details: ApiTagsModelDetails,
 }
 
 #[derive(serde_derive::Deserialize)]
-struct DataModel {
-    models: Vec<Model>,
+struct DataApiTagsModel {
+    models: Vec<ApiTagsModel>,
 }
 
 fn main() {
@@ -42,7 +42,7 @@ fn main() {
             let res = client.get("http://localhost:11434/api/tags").send().expect(&msg);
             if res.status().is_success() {
                 let msg = "chatbot: HttpRequestJSONUnWrapError";
-                let data: DataModel = res.json::<DataModel>().expect(&msg);
+                let data: DataApiTagsModel = res.json::<DataApiTagsModel>().expect(&msg);
                 println!("chatbot: available models:\n\n");
                 for model in data.models {
                     println!("name: {:?}", model.name);
