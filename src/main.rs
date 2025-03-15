@@ -3,7 +3,7 @@ fn main() {
     let stdin = std::io::stdin();
     loop {
         buf.clear();
-        stdin.read_line(&mut buf).unwrap();
+        stdin.read_line(&mut buf).expect("chatbot: IOERR");
         if buf.contains("quit") {
             break;
         } else {
