@@ -1,6 +1,6 @@
 use std::io::Write;
 
-#[derive(serde_derive::Serialize, Clone)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Clone)]
 struct ApiChatMessage {
     role: String,
     content: String,
@@ -11,6 +11,21 @@ struct ApiChat {
     model: String,
     messages: Vec<ApiChatMessage>,
     stream: bool,
+}
+
+#[derive(serde_derive::Deserialize)]
+struct DataApiChat {
+    model: String,
+    created_at: String,
+    message: ApiChatMessage,
+    done_reason: String,
+    done: bool,
+    total_duration: u64,
+    load_duration: u64,
+    prompt_eval_count: u64,
+    prompt_eval_duration: u64,
+    eval_count: u64,
+    eval_duration: u64,
 }
 
 #[derive(serde_derive::Deserialize)]
@@ -79,7 +94,6 @@ fn main() {
                 println!("chatbot: done");
             }
         } else {
-            // TODO: deserialize LLM response and store it the messages array
             chat.messages.push(ApiChatMessage {
                 role: String::from("user"),
                 content: String::from(prompt),
@@ -90,8 +104,10 @@ fn main() {
                 .send()
                 .expect(&msg);
             if res.status().is_success() {
-                let msg = "chatbot: HttpPostRequestTextError";
-                println!("res: {:?}", res.text().expect(&msg));
+                let msg = "chatbot: HttpPostRequestDeserializeError";
+                let message = res.json::<DataApiChat>().expect(&msg).message;
+                println!("chatbot: {:?}", message.content);
+                chat.messages.push(message);
             }
         }
     }
