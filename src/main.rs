@@ -1,3 +1,12 @@
+/*
+   chatbot
+   source: main.rs
+   author: @misael-diaz
+   Copyright (C) 2025 Misael Díaz-Maldonado
+   This file is released under the GNU General Public License version 2 only
+   as published by the Free Software Foundation.
+*/
+
 use std::io::Write;
 
 #[derive(serde_derive::Serialize, serde_derive::Deserialize, Clone)]
@@ -62,6 +71,14 @@ fn main() {
     let client = reqwest::blocking::Client::new();
     let mut buf = String::new();
     let stdin = std::io::stdin();
+    println!(
+    r#"
+    chatbot
+    Copyright (C) 2025 Misael Díaz-Maldonado
+    chatbot is released under the GNU General Public License version 2 only
+    as published by the Free Software Foundation.
+    "#
+    );
     loop {
         print!("prompt:");
         std::io::stdout().flush().expect("chatbot: IOERR");
