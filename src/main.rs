@@ -1,5 +1,18 @@
 use std::io::Write;
 
+#[derive(serde_derive::Serialize, Clone)]
+struct ApiChatMessage {
+    role: String,
+    content: String,
+}
+
+#[derive(serde_derive::Serialize)]
+struct ApiChat {
+    model: String,
+    messages: Vec<ApiChatMessage>,
+    stream: bool,
+}
+
 #[derive(serde_derive::Deserialize)]
 struct ApiTagsModelDetails {
     parent_model: String,
@@ -61,7 +74,22 @@ fn main() {
                 println!("chatbot: done");
             }
         } else {
-            // TODO: forward prompt to the LLM
+            let msg = "chatbot: HttpPostRequestError";
+            let res = client.post("http://localhost:11434/api/chat")
+                .json(&ApiChat {
+                    model: String::from("llama3.2"),
+                    messages: Vec::from(&[ApiChatMessage {
+                        role: String::from("user"),
+                        content: String::from(prompt),
+                    }]),
+                    stream: false,
+                })
+                .send()
+                .expect(&msg);
+            if res.status().is_success() {
+                let msg = "chatbot: HttpPostRequestTextError";
+                println!("res: {:?}", res.text().expect(&msg));
+            }
         }
     }
 }
