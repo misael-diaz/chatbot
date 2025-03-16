@@ -39,6 +39,11 @@ struct DataApiTagsModel {
 }
 
 fn main() {
+    let mut chat = ApiChat {
+        model: String::from("llama3.2"),
+        messages: Vec::new(),
+        stream: false,
+    };
     let client = reqwest::blocking::Client::new();
     let mut buf = String::new();
     let stdin = std::io::stdin();
@@ -75,16 +80,13 @@ fn main() {
             }
         } else {
             // TODO: deserialize LLM response and store it the messages array
+            chat.messages.push(ApiChatMessage {
+                role: String::from("user"),
+                content: String::from(prompt),
+            });
             let msg = "chatbot: HttpPostRequestError";
             let res = client.post("http://localhost:11434/api/chat")
-                .json(&ApiChat {
-                    model: String::from("llama3.2"),
-                    messages: Vec::from(&[ApiChatMessage {
-                        role: String::from("user"),
-                        content: String::from(prompt),
-                    }]),
-                    stream: false,
-                })
+                .json(&chat)
                 .send()
                 .expect(&msg);
             if res.status().is_success() {
