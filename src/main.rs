@@ -74,6 +74,7 @@ fn main() {
                 println!("chatbot: done");
             }
         } else {
+            // TODO: deserialize LLM response and store it the messages array
             let msg = "chatbot: HttpPostRequestError";
             let res = client.post("http://localhost:11434/api/chat")
                 .json(&ApiChat {
