@@ -67,6 +67,7 @@ fn save_history(chat: &ApiChat) {
     let history = homedir + "/.chatbot/cache/chat-history.json";
     let mut file = std::fs::OpenOptions::new()
         .write(true)
+        .truncate(true)
         .create(true)
         .open(&history)
         .expect("chatbot: failed to save chat-history due to IOERR");
