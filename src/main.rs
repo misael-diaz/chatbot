@@ -7,6 +7,7 @@
    as published by the Free Software Foundation.
 */
 
+use std::io::Read;
 use std::io::Write;
 
 #[derive(serde_derive::Serialize, serde_derive::Deserialize, Clone)]
@@ -15,7 +16,7 @@ struct ApiChatMessage {
     content: String,
 }
 
-#[derive(serde_derive::Serialize)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize)]
 struct ApiChat {
     model: String,
     messages: Vec<ApiChatMessage>,
@@ -62,6 +63,21 @@ struct DataApiTagsModel {
     models: Vec<ApiTagsModel>,
 }
 
+fn load_history(chat: &mut ApiChat) {
+    let homedir = std::env::var("HOME").expect("UserHomeDirError");
+    let history = homedir + "/.chatbot/cache/chat-history.json";
+    let res = std::fs::OpenOptions::new().read(true).open(&history);
+    match res {
+        Ok(mut file) => {
+            let msg = "chatbot: DeserializeChatHistoryError";
+            let mut data: Vec<u8> = Vec::new();
+            file.read_to_end(&mut data).expect("chatbot: ReadChatHistoryError");
+            chat.messages = serde_json::from_slice(&data).expect(&msg);
+        },
+        Err(_) => (),
+    };
+}
+
 fn save_history(chat: &ApiChat) {
     let homedir = std::env::var("HOME").expect("UserHomeDirError");
     let history = homedir + "/.chatbot/cache/chat-history.json";
@@ -83,6 +99,7 @@ fn main() {
         messages: Vec::new(),
         stream: false,
     };
+    load_history(&mut chat);
     let client = reqwest::blocking::Client::new();
     let mut buf = String::new();
     let stdin = std::io::stdin();
