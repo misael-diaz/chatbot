@@ -62,8 +62,21 @@ struct DataApiTagsModel {
     models: Vec<ApiTagsModel>,
 }
 
-fn main() {
+fn save_history(chat: &ApiChat) {
     let homedir = std::env::var("HOME").expect("UserHomeDirError");
+    let history = homedir + "/.chatbot/cache/chat-history.json";
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open(&history)
+        .expect("chatbot: failed to save chat-history due to IOERR");
+    let msgs = serde_json::to_vec(&chat.messages).expect("chatbot: SerializationError");
+    file.write_all(&msgs).expect("chatbot: SaveChatHistoryError");
+    std::mem::drop(file);
+    println!("chatbot: saved chat-history to {:?}", history);
+}
+
+fn main() {
     let mut chat = ApiChat {
         model: String::from("llama3.2"),
         messages: Vec::new(),
@@ -129,14 +142,5 @@ fn main() {
             }
         }
     }
-    let history = homedir + "/.chatbot/cache/chat-history.json";
-    let mut file = std::fs::OpenOptions::new()
-        .write(true)
-        .create(true)
-        .open(&history)
-        .expect("chatbot: failed to save chat-history due to IOERR");
-    let msgs = serde_json::to_vec(&chat.messages).expect("chatbot: SerializationError");
-    file.write_all(&msgs).expect("chatbot: SaveChatHistoryError");
-    std::mem::drop(file);
-    println!("chatbot: saved chat-history to {:?}", history);
+    save_history(&chat);
 }
