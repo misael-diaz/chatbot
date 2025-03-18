@@ -156,7 +156,7 @@ fn main() {
             if res.status().is_success() {
                 let msg = "chatbot: HttpPostRequestDeserializeError";
                 let message = res.json::<DataApiChat>().expect(&msg).message;
-                println!("chatbot: {:?}", message.content);
+                println!("chatbot: {0}", message.content);
                 chat.messages.push(message);
             }
         }
