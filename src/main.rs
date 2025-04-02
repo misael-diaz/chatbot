@@ -149,7 +149,7 @@ fn main() {
             });
             let msg = "chatbot: HttpPostRequestError";
             let res = client.post("http://localhost:11434/api/chat")
-                .timeout(std::time::Duration::from_secs(5 * 60))
+                .timeout(std::time::Duration::from_secs(15 * 60))
                 .json(&chat)
                 .send()
                 .expect(&msg);
